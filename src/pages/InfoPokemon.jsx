@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import Fade from "@mui/material/Fade";
 import Container from "@mui/material/Container";
@@ -25,6 +25,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getPokemonById, selectDataPokemonId } from "./../reducers/pokemon";
+import { setTitle } from "../reducers/general";
 
 //import { selectDataAbility, getAbilityById } from "../reducers/ability";
 
@@ -48,6 +49,7 @@ import useModal from "../hooks/useModal";
 import { fixEvolutionChain } from "../helpers";
 
 import { URL_IMAGE_ITEMS, URL_IMAGE_ARTWORKS } from "./../helpers/constants";
+import TableStats from "../components/TableStats";
 
 const UrlBase = URL_IMAGE_ARTWORKS;
 
@@ -100,6 +102,8 @@ const InfoPokemon = () => {
 
   const { isShowing, toggle } = useModal();
 
+  //const appBarTitle = useSelector((state) => state.general.title);
+
   useEffect(() => {
     if (isForm) {
       setIdImage(idImage);
@@ -108,6 +112,7 @@ const InfoPokemon = () => {
     }
 
     dispatch(getPokemonById(idImage));
+    dispatch(setTitle(`PokeDex | Information`));
     setShiny(false);
 
     //console.log(id, data?.pokemon_original_id, idImage);
@@ -120,6 +125,11 @@ const InfoPokemon = () => {
   }, [location]);
 
   const { colorType1, colorType2 } = colorPokemonTypes(data?.types);
+
+  let evolutionChain = useMemo(() => {
+    console.log("memo activado");
+    return fixEvolutionChain(data?.evolution_chain);
+  }, [data?.evolution_chain]);
 
   if (loading) {
     return (
@@ -186,8 +196,6 @@ const InfoPokemon = () => {
   let prevPokemon = data?.id === 1 ? data?.id : data?.id - 1;
   let nextPokemon = data?.id === 905 ? data?.id : data?.id + 1;
 
-  let evolutionChain = fixEvolutionChain(data?.evolution_chain);
-
   return (
     <Container
       maxWidth="xl"
@@ -208,7 +216,15 @@ const InfoPokemon = () => {
         justifyContent="space-around"
         position="relative"
       >
-        <Grid item xs={2} sx={{ position: "absolute", left: 0 }}>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <StyledLink
             to={`/pokemon/${prevPokemon}`}
             color={colorType1}
@@ -223,12 +239,11 @@ const InfoPokemon = () => {
           <Typography
             component="h1"
             sx={{
-              //color: `${colorType1} !important`,
               background: `linear-gradient(to right, ${colorType1}, ${colorType2})`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               fontWeight: "bold",
-              fontSize: "8vw",
+              fontSize: data?.name.length === 10 ? "7vw" : "8vw",
               textAlign: "center",
               textTransform: "uppercase",
             }}
@@ -236,7 +251,15 @@ const InfoPokemon = () => {
             {fixPokemonName(data?.name)}
           </Typography>
         </Grid>
-        <Grid item xs={2} sx={{ position: "absolute", right: 0 }}>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <StyledLink to={`/pokemon/${nextPokemon}`} color={colorType2}>
             <ChevronRightIcon />
           </StyledLink>
@@ -386,6 +409,11 @@ const InfoPokemon = () => {
             stats={data?.stats}
             colorType={[colorType1, colorType2]}
           />
+          {/* <TableStats
+            pokemonId={data?.id}
+            stats={data?.stats}
+            colorType={[colorType1, colorType2]}
+          /> */}
         </Grid>
         <Grid item xs={12}>
           <Typography variant="h5" align="center">
@@ -490,8 +518,6 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
       min_beauty,
     }).filter((v) => v[1] !== null);
 
-    //console.log(other.species_name, minLevelArray);
-
     let textLevel = "";
     if (minLevelArray.length > 1) {
       throw new Error("Revisar que el length es mayor");
@@ -507,7 +533,7 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
     }
 
     if (item !== null) {
-      return fixTrigger + " " + item;
+      return fixTrigger + " " + item.replace("-", " ");
     }
 
     //Data to show if
@@ -521,9 +547,6 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
           ? "Attack > Defense"
           : "Attack < Defense";
     }
-
-    //console.log(physicalStats);
-
     return fixTrigger + " " + textLevel + "\n" + physicalStats;
   };
 
@@ -561,7 +584,11 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
           <Typography variant={"body1"} component="h5">
             {pokemonDetail.id}
           </Typography>
-          <Typography variant={"body1"} component="h5">
+          <Typography
+            variant={"body1"}
+            component="h5"
+            textTransform="capitalize"
+          >
             {fixPokemonName(pokemonDetail.species_name)}
           </Typography>
         </Box>

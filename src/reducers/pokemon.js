@@ -98,6 +98,7 @@ export const pokemonSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(getPokemonById.pending, (state) => {
+        state.dataPokemonId = [];
         state.loadingId = true;
       })
       .addCase(getPokemonById.rejected, (state, action) => {

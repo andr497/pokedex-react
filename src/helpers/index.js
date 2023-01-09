@@ -88,25 +88,6 @@ export function convertDecimeterToMeter(mt) {
   return mt / 10;
 }
 
-const getEvo = (evolvesTo) => {
-  console.log("GET EVO", evolvesTo);
-  let urlArtWork =
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
-
-  return evolvesTo.map((value) => {
-    let pokemonID = value.species.url.split("/")[6];
-
-    return {
-      id: pokemonID,
-      species_name: value.species.name,
-      min_level: !value ? null : value?.evolution_details[0]?.min_level,
-      trigger_name: !value ? null : value?.evolution_details[0]?.trigger?.name,
-      item: !value ? null : value?.evolution_details[0]?.item?.name,
-      image: urlArtWork + pokemonID + ".png",
-    };
-  });
-};
-
 const depthFirst = (getChildren) => (tree, path) =>
   [
     { node: tree, path },
@@ -291,4 +272,16 @@ export function calculateStatsPokemon(stats, id) {
     maxStats: maxStats,
     minStats: minStats,
   };
+}
+
+//Other functions
+
+export function wc_hex_is_light(color) {
+  const hex = color.replace("#", "");
+  const c_r = parseInt(hex.substr(0, 2), 16);
+  const c_g = parseInt(hex.substr(2, 2), 16);
+  const c_b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (c_r * 299 + c_g * 587 + c_b * 114) / 1000;
+
+  return brightness < 155;
 }

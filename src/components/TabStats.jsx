@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 
-import { styled, useTheme } from "@mui/material/styles";
+import { keyframes, styled, useTheme } from "@mui/material/styles";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
 
 import LinearProgress, {
   linearProgressClasses,
@@ -13,8 +18,8 @@ import LinearProgress, {
 
 import {
   calculateStatsPokemon,
-  fixPokemonName,
   fixStatsName,
+  wc_hex_is_light,
 } from "./../helpers";
 
 import useWidth from "../hooks/useWidth";
@@ -53,6 +58,20 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   })
 );
 
+const animationKeyframes = (typecolor) => {
+  return keyframes({
+    "0%": {
+      background: `linear-gradient(45deg, ${typecolor[0]}, ${typecolor[1]})`,
+    },
+    "50%": {
+      background: `linear-gradient(45deg, ${typecolor[1]}, ${typecolor[0]})`,
+    },
+    "100%": {
+      background: `linear-gradient(45deg, ${typecolor[0]}, ${typecolor[1]})`,
+    },
+  });
+};
+
 const ProgressBarStat = styled(LinearProgress)(({ theme, typecolor }) => ({
   height: 20,
   borderRadius: 5,
@@ -66,63 +85,43 @@ const ProgressBarStat = styled(LinearProgress)(({ theme, typecolor }) => ({
   },
   "& .MuiLinearProgress-bar": {
     // apply a new animation-duration to the `.bar` class
-    background: `repeating-linear-gradient(45deg,${typecolor[0]},${typecolor[0]} 10px,${typecolor[1]} 10px,${typecolor[1]} 20px)`,
+    //background: `repeating-linear-gradient(45deg,${typecolor[0]},${typecolor[0]} 10px,${typecolor[1]} 10px,${typecolor[1]} 20px)`,
+    //animation: `${animationKeyframes(typecolor)} 2s ease-in-out`,
+    //animationIterationCount: "infinite",
+    background: `linear-gradient(45deg, ${typecolor[0]}, ${typecolor[1]})`,
   },
 }));
 
 function LinearProgressWithLabel(props) {
   const theme = useTheme();
-  const width = useWidth();
-
-  //console.log(theme.breakpoints.;
   const labelValue = Math.round(props.label).toString();
 
-  const diffValue = {
-    xs: 2,
-    sm: 1,
-    md: 0,
-    lg: -1,
-    xl: -2,
-  };
+  let calculateSpace = 100 - props.value;
 
-  const restMargin = labelValue.length + diffValue[width];
-
-  let calculateSpace = (20 + props.value) * 0.8;
-  calculateSpace = calculateSpace > 100 ? 100 : calculateSpace - restMargin;
-  calculateSpace = calculateSpace < 20 ? 20 : calculateSpace;
-
-  //console.log(`Calcular position ${props.description}`, calculateSpace);
-  //console.log(width);
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
         position: "relative",
-        margin: "10px 0px",
-        width: "100%",
       }}
     >
-      <Typography
-        component="span"
-        variant="subtitle1"
-        sx={{ width: "20%", textTransform: "capitalize", textAlign: "right" }}
-      >
-        {fixStatsName(props.description)}
-      </Typography>
-      <Box sx={{ width: "80%", ml: 1 }}>
+      <Box sx={{ width: "100%" }}>
         <ProgressBarStat variant="determinate" {...props} />
       </Box>
       <Box
         sx={{
           position: "absolute",
-          left: `${calculateSpace}%`,
+          top: 0,
+          right: `${calculateSpace}%`,
           transition: "all ease-in-out .5s",
         }}
       >
         <Typography
           variant="body2"
-          sx={{ color: "inherit !important" }}
+          sx={{
+            color: wc_hex_is_light(props.typecolor[1]) ? "white" : "black",
+            fontWeight: "bold",
+            mr: 0.5,
+          }}
         >{`${labelValue}`}</Typography>
       </Box>
     </Box>
@@ -148,19 +147,45 @@ function TabPanel(props) {
 const TabsContent = ({ value, datos, colorType }) => {
   return (
     <TabPanel value={value} index={value}>
-      <Box sx={{ p: 3 }}>
-        {datos?.map((value, key) => (
-          <Box key={key}>
-            <LinearProgressWithLabel
-              value={value.percentage}
-              variant="determinate"
-              label={value.base_stat}
-              description={value.name}
-              typecolor={colorType}
-            />
-          </Box>
-        ))}
-      </Box>
+      <Table>
+        <TableBody sx={{ p: 3 }}>
+          {datos?.map((value, key) => (
+            <TableRow key={key}>
+              <TableCell
+                component="th"
+                scope="row"
+                align="right"
+                sx={{
+                  textTransform: "capitalize",
+                  border: "none",
+                }}
+              >
+                {fixStatsName(value.name)}
+              </TableCell>
+              <TableCell
+                sx={{
+                  width: "100%",
+                  border: "none",
+                }}
+              >
+                {/* <ProgressBarStat
+                  variant="determinate"
+                  value={value.percentage}
+                  label={value.base_stat}
+                  typecolor={colorType}
+                /> */}
+                <LinearProgressWithLabel
+                  value={value.percentage}
+                  variant="determinate"
+                  label={value.base_stat}
+                  description={value.name}
+                  typecolor={colorType}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </TabPanel>
   );
 };
