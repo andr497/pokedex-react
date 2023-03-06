@@ -1,21 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 
-import Fade from "@mui/material/Fade";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
@@ -25,31 +20,22 @@ import { useParams, Link, useLocation } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getPokemonById, selectDataPokemonId } from "./../reducers/pokemon";
-import { setTitle } from "../reducers/general";
 
 //import { selectDataAbility, getAbilityById } from "../reducers/ability";
 
-import { fetchAbilityById } from "./../api/abilities";
-
 import TabStats from "../components/TabStats";
-import BadgeTypes from "../components/BadgeTypes";
 
-import {
-  colorPokemonTypes,
-  convertDecimeterToMeter,
-  convertHectogramToKilogram,
-  fixPokemonName,
-  fixAbilitiesName,
-} from "./../helpers";
+import { colorPokemonTypes, fixPokemonName } from "./../helpers";
 import { styled, useTheme } from "@mui/material/styles";
-
-import Modal from "../components/Modal";
-import useModal from "../hooks/useModal";
 
 import { fixEvolutionChain } from "../helpers";
 
 import { URL_IMAGE_ITEMS, URL_IMAGE_ARTWORKS } from "./../helpers/constants";
 import TableStats from "../components/TableStats";
+
+import ErrorPage from "./ErrorPage";
+
+import PokemonCardBasicDetails from "../components/InfoPokemon/PokemonCardBasicDetails";
 
 const UrlBase = URL_IMAGE_ARTWORKS;
 
@@ -67,30 +53,11 @@ const StyledLink = styled(Link)((props) => ({
   },
 }));
 
-const StyleChip = styled(Chip)(({ theme }) => ({
-  borderRadius: "0px",
-  color: theme.palette.text.secondary,
-  textTransform: "capitalize",
-  ".MuiChip-icon": {
-    width: "18px",
-    height: "18px",
-    path: {
-      fill: theme.palette.text.secondary,
-    },
-  },
-}));
-
 const InfoPokemon = () => {
   const theme = useTheme();
-  const data = useSelector(selectDataPokemonId);
-  const loading = useSelector((state) => state.pokemon.loadingId);
-  const error = useSelector((state) => state.pokemon.errorPokemonId);
-
-  const [messageModal, setMessageModal] = useState({
-    title: "",
-    content: "",
-    transformTitleCss: "none",
-  });
+  let data = useSelector(selectDataPokemonId);
+  let loading = useSelector((state) => state.pokemon.loadingId);
+  let error = useSelector((state) => state.pokemon.errorPokemonId);
 
   const dispatch = useDispatch();
 
@@ -100,36 +67,52 @@ const InfoPokemon = () => {
   const [isForm, setIsForm] = useState(false);
   const [shiny, setShiny] = useState(false);
 
-  const { isShowing, toggle } = useModal();
-
   //const appBarTitle = useSelector((state) => state.general.title);
-
-  useEffect(() => {
-    if (isForm) {
-      setIdImage(idImage);
-    } else {
-      setIdImage(id);
-    }
-
-    dispatch(getPokemonById(idImage));
-    dispatch(setTitle(`PokeDex | Information`));
-    setShiny(false);
-
-    //console.log(id, data?.pokemon_original_id, idImage);
-  }, [dispatch, idImage, id, isForm]);
-
   const location = useLocation();
+
+  // useEffect(() => {
+  //   const idToUpdate = isForm ? idImage : id;
+  //   dispatch(getPokemonById(idToUpdate));
+  //   setShiny(false);
+  //   setIdImage(idToUpdate);
+  // }, [dispatch, id, idImage, isForm]);
+
+  // useEffect(() => {
+  //   if (data) {
+  //     setIdImage(data.id);
+  //   }
+  // }, [data]);
+
   useEffect(() => {
-    console.log("url changed");
+    const idToRender = isForm ? idImage : id;
+
+    dispatch(getPokemonById(idToRender));
+    setShiny(false);
+    setIdImage(idToRender);
+  }, [dispatch, id, idImage, isForm]);
+
+  useEffect(() => {
+    if (data) {
+      setIdImage(data.id);
+    }
+  }, []);
+
+  useEffect(() => {
     setIsForm(false);
   }, [location]);
 
   const { colorType1, colorType2 } = colorPokemonTypes(data?.types);
 
   let evolutionChain = useMemo(() => {
-    console.log("memo activado");
     return fixEvolutionChain(data?.evolution_chain);
   }, [data?.evolution_chain]);
+
+  const [prevPokemon, nextPokemon] = useMemo(() => {
+    const prevPokemon = data?.id === 1 ? data?.id : data?.id - 1;
+    const nextPokemon = data?.id === 1008 ? data?.id : data?.id + 1;
+
+    return [prevPokemon, nextPokemon];
+  }, [data?.id]);
 
   if (loading) {
     return (
@@ -143,58 +126,13 @@ const InfoPokemon = () => {
   }
 
   if (error) {
-    throw new Error("Algo malo paso carnal :c");
     return (
-      <Container
-        sx={{
-          display: "grid",
-          placeItems: "center",
-          margin: "auto",
-        }}
-      >
-        <img
-          src="https://www.pngplay.com/wp-content/uploads/12/Pikachu-Meme-Transparent-Image.png"
-          style={{
-            width: "420px",
-          }}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            justifyContent: "center",
-            textAlign: "center",
-          }}
-        >
-          <Typography
-            variant="h1"
-            component="h1"
-            sx={{ fontSize: "4rem", color: theme.palette.text.primary }}
-          >
-            Oops! Something is wrong
-          </Typography>
-          <Typography
-            variant="body1"
-            component="p"
-            sx={{
-              fontSize: "20px",
-              margin: "30px 0px",
-              width: "100%",
-              minWidth: "350px",
-              color: theme.palette.text.secondary,
-            }}
-          >
-            The pokemon you are looking for might be not exist.
-          </Typography>
-          <Link to="/">Go to Home</Link>
-        </Box>
-      </Container>
+      <ErrorPage
+        title="Oops! Something is wrong"
+        message={`The pokemon "${id}" you are looking for might be not exist.`}
+      />
     );
   }
-
-  let prevPokemon = data?.id === 1 ? data?.id : data?.id - 1;
-  let nextPokemon = data?.id === 905 ? data?.id : data?.id + 1;
 
   return (
     <Container
@@ -202,8 +140,7 @@ const InfoPokemon = () => {
       component="main"
       sx={{
         position: "relative",
-        //background: `linear-gradient(to right, ${colorType1}, ${colorType2})`,
-        minHeight: "100vh",
+        height: "calc(100vh - 50px)",
         width: "100%",
         margin: 0,
         padding: 0,
@@ -260,139 +197,45 @@ const InfoPokemon = () => {
             justifyContent: "center",
           }}
         >
-          <StyledLink to={`/pokemon/${nextPokemon}`} color={colorType2}>
+          <StyledLink
+            to={`/pokemon/${nextPokemon}`}
+            color={colorType2}
+            onKeyPress={(e) => {
+              console.log(e.key);
+            }}
+          >
             <ChevronRightIcon />
           </StyledLink>
         </Grid>
       </Grid>
-      <Grid container sx={{ display: "flex", alignItems: "center" }}>
+      <Grid
+        container
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <Grid item xs={12} md={3}>
-          <Box>
-            {/* <Button
-                onClick={() => {
-                  setShiny((prev) => !prev);
-                }}
-              >
-                {!shiny ? "Shiny Mode" : "Normal Mode"}
-              </Button> */}
-            <Typography variant="h5">ID: {data?.id}</Typography>
-            <Typography variant="h5">
-              Height: {convertDecimeterToMeter(data?.height)}M
-            </Typography>
-            <Typography variant="h5">
-              Weight: {convertHectogramToKilogram(data?.weight)}Kg
-            </Typography>
-            <Typography variant="h5">
-              Type:{" "}
-              <BadgeTypes
-                types={data?.types}
-                display="inline"
-                justifyContent="center"
-              />
-            </Typography>
-            <Typography variant="h6">
-              Abilities:
-              {data?.abilities.map((value, key) => {
-                const fixedAbilityName = fixAbilitiesName(value.ability.name);
-                return (
-                  <Tooltip key={key} title={value.is_hidden ? "Hidden" : ""}>
-                    <StyleChip
-                      label={fixedAbilityName}
-                      icon={value.is_hidden ? <AutoAwesomeIcon /> : null}
-                      onClick={() => {
-                        fetchAbilityById(value.ability.name).then((res) => {
-                          const description = res.data.effect_entries.filter(
-                            (v) => v.language.name === "en"
-                          );
-
-                          const data = {
-                            title: `Ability - ${fixedAbilityName}`,
-                            transformTitleCss: "capitalize",
-                            content: () => (
-                              <>
-                                <Typography
-                                  align="center"
-                                  variant="h6"
-                                  component="h6"
-                                  sx={{
-                                    color: colorType1,
-                                  }}
-                                >
-                                  Effect
-                                </Typography>
-
-                                <Typography
-                                  align="justify"
-                                  variant="body1"
-                                  component="p"
-                                >
-                                  {description[0].effect}
-                                </Typography>
-
-                                <Typography
-                                  align="center"
-                                  variant="h6"
-                                  component="h6"
-                                  sx={{
-                                    color: colorType1,
-                                  }}
-                                >
-                                  Short effect
-                                </Typography>
-                                <Typography
-                                  align="justify"
-                                  variant="body1"
-                                  component="p"
-                                >
-                                  {description[0].short_effect}
-                                </Typography>
-                              </>
-                            ),
-                          };
-
-                          setMessageModal(data);
-                          toggle();
-                        });
-                      }}
-                    />
-                  </Tooltip>
-                );
-              })}
-            </Typography>
-            <Modal
-              isShowing={isShowing}
-              hide={toggle}
-              title={messageModal.title}
-              transformTitleCss={messageModal.transformTitleCss}
-              content={messageModal.content}
+          {data ? (
+            <PokemonCardBasicDetails
+              pokemonId={data?.id}
+              colors={{ colorType1, colorType2 }}
+              height={data?.height}
+              weight={data?.weight}
+              types={data?.types}
+              abilities={data?.abilities}
+              varieties={data?.varieties}
+              setIdImage={setIdImage}
+              setIsForm={setIsForm}
             />
-            <Typography variant="h6">
-              Forms:
-              {data?.varieties.map((value, key) => (
-                <Tooltip key={key} title={value.is_hidden ? "Hidden" : ""}>
-                  <StyleChip
-                    label={fixPokemonName(value.pokemon.name)}
-                    onClick={() => {
-                      const idImageSelected = value.pokemon.url.split("/")[6];
-
-                      if (id !== idImageSelected) {
-                        setIsForm(true);
-                      } else {
-                        setIsForm(false);
-                      }
-                      setIdImage(idImageSelected);
-                    }}
-                  />
-                </Tooltip>
-              ))}
-            </Typography>
-          </Box>
+          ) : null}
         </Grid>
         <Grid item xs={12} md={4} display="center" justifyContent="center">
           <LazyLoadImage
-            src={`${UrlBase}${
-              idImage == 10158 ? "pikachu-partner" : idImage
-            }.png`}
+            // src={`${UrlBase}${
+            //   idImage == 10158 ? "pikachu-partner" : idImage
+            // }.png`}
+            src={data?.artwork_url}
             alt={`pokemon-${data?.name}`}
             effect="blur"
             placeholderSrc={`/pokeball.png`}

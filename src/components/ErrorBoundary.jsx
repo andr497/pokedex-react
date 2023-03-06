@@ -1,28 +1,46 @@
 import React from "react";
 
 export class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, message: null };
-  }
+  state = {
+    hasError: false,
+    errorMessage: "",
+  };
 
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    console.log("simon", error);
-    return { hasError: true, message: error.message };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
-    console.log(error, errorInfo);
-  }
+  componentDidCatch = (error, info) => {
+    this.setState({ hasError: true, errorMessage: error.message });
+  };
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>{this.state.message}</h1>;
+      return (
+        <div style={styles.container}>
+          <h1 style={styles.title}>Oops! Algo salió mal.</h1>
+          <p style={styles.description}>{this.state.errorMessage}</p>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    flexDirection: "column",
+    fontFamily: "sans-serif",
+  },
+  title: {
+    fontSize: "3rem",
+    fontWeight: "bold",
+    color: "#ff5a5f",
+    marginBottom: "1rem",
+  },
+  description: {
+    fontSize: "1.5rem",
+    color: "#333",
+  },
+};

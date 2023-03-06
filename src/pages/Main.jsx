@@ -10,10 +10,8 @@ import PokemonBasicCard from "../components/PokemonBasicCard";
 
 import MyPagination from "./../components/MyPagination";
 import { LIMIT_PAGE } from "../helpers/constants";
-import useDocumentTitle from "./../hooks/useDocumentTitle";
 
 const Main = () => {
-  const [documentTitle, setDocumentTitle] = useDocumentTitle("PokéDex");
   const data = useSelector(selectDataPokemon);
   const loading = useSelector((state) => state.pokemon.loading);
 
@@ -41,8 +39,57 @@ const Main = () => {
     setCurrentPage(page);
   };
 
+  const renderPagination = (
+    <Grid
+      container
+      item
+      marginTop={4}
+      marginBottom={4}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <Grid item>
+        <MyPagination
+          page={currentPage}
+          count={isNaN(countPages) ? 1 : countPages}
+          pageClicked={(e) => {
+            afterPage(e);
+          }}
+        />
+      </Grid>
+    </Grid>
+  );
+
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <Grid component="article" container maxWidth="xl" width="100%">
+    <Grid
+      container
+      component="article"
+      maxWidth="xl"
+      width="100%"
+      height="100%"
+    >
+      {renderPagination}
+      {`${windowSize.width} x ${windowSize.height}`}
       <Grid container item spacing={{ xs: 1, md: 2 }}>
         {!loading
           ? data?.results.map((value) => (
@@ -68,17 +115,7 @@ const Main = () => {
               </Grid>
             ))}
       </Grid>
-      <Grid container item>
-        <Grid item xs={12} sm={6} md={4}>
-          <MyPagination
-            page={currentPage}
-            count={isNaN(countPages) ? 1 : countPages}
-            pageClicked={(e) => {
-              afterPage(e);
-            }}
-          />
-        </Grid>
-      </Grid>
+      {renderPagination}
     </Grid>
   );
 };

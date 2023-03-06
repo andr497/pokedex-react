@@ -7,8 +7,11 @@ import PaginationItem from "@mui/material/PaginationItem";
 export default function MyPagination({ page, count, pageClicked }) {
   return (
     <Pagination
+      sx={{ display: "flex", justifyContent: "center" }}
       page={page}
       count={count}
+      siblingCount={1}
+      boundaryCount={1}
       renderItem={(item) => {
         return (
           <PaginationItem

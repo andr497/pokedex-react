@@ -1,10 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createAction } from "@reduxjs/toolkit";
 import {
   fetchAllPokemon,
   fetchPokemonById,
   fetchPokemonSpeciesById,
 } from "../api/pokemon";
-import { LIMIT_PAGE } from "../helpers/constants";
+import { LIMIT_PAGE, URL_IMAGE_ARTWORKS } from "../helpers/constants";
+import { Try } from "@mui/icons-material";
 
 const initialState = {
   loading: false,
@@ -66,6 +67,7 @@ export const getPokemonById = createAsyncThunk(
 
           return {
             ...response.data,
+            artwork_url: `${URL_IMAGE_ARTWORKS}${id}.png`,
             evolution_chain: evolutionData,
           };
         });
@@ -84,6 +86,48 @@ export const getPokemonById = createAsyncThunk(
   }
 );
 
+export const getPokemonByIdNoDispatch = async (id) => {
+  let pokemonSpecieId = id;
+  const pokemonResponse = await fetchPokemonById(id).then(async (response) => {
+    pokemonSpecieId = response.data.species.url.split("/")[6];
+
+    const speciesResponse = await fetchPokemonSpeciesById(pokemonSpecieId).then(
+      async (response) => {
+        const evolutionUrl = response.data.evolution_chain?.url ?? null;
+
+        if (evolutionUrl === null) {
+          return {
+            varieties: [],
+          };
+        }
+
+        const evolutionData = await fetch(evolutionUrl, {
+          method: "GET",
+        }).then(async (res) => {
+          return await res.json();
+        });
+
+        return {
+          ...response.data,
+          evolution_chain: evolutionData,
+        };
+      }
+    );
+
+    return {
+      ...response.data,
+      ...speciesResponse,
+    };
+  });
+
+  return {
+    ...pokemonResponse,
+    pokemon_original_id: pokemonSpecieId,
+  };
+};
+
+export const updateDataPokemonId = createAction("updateDataPokemonId");
+
 export const pokemonSlice = createSlice({
   name: "pokemon",
   initialState,
@@ -98,7 +142,8 @@ export const pokemonSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(getPokemonById.pending, (state) => {
-        state.dataPokemonId = [];
+        console.log("PENDIENTE");
+        state.dataPokemonId = null;
         state.loadingId = true;
       })
       .addCase(getPokemonById.rejected, (state, action) => {
@@ -106,6 +151,7 @@ export const pokemonSlice = createSlice({
         state.errorPokemonId = action.error;
       })
       .addCase(getPokemonById.fulfilled, (state, action) => {
+        console.log("FULFILLED");
         state.dataPokemonId = action.payload;
         state.errorPokemonId = false;
         state.loadingId = false;

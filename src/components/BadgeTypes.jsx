@@ -25,8 +25,10 @@ const StyledChip = styled(Chip)(({ typecolor }) => ({
 
 const BadgeTypes = ({
   types,
+  size = "small",
   display = "flex",
   justifyContent = "space-around",
+  styles = {},
 }) => {
   return (
     <Box
@@ -35,6 +37,7 @@ const BadgeTypes = ({
         justifyContent: justifyContent,
         margin: 0,
         padding: 0,
+        ...styles,
       }}
     >
       {types?.map((value, key) => (
@@ -43,7 +46,7 @@ const BadgeTypes = ({
           label={value.type.name}
           icon={iconTypePokemon[value.type?.name]}
           typecolor={COLOR[value.type?.name]}
-          size="small"
+          size={size}
         />
       ))}
     </Box>
