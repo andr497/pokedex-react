@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 
-import { Link } from "react-router-dom";
-
 import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 
 import MoreIcon from "@mui/icons-material/MoreVert";
-import HomeIcon from "@mui/icons-material/Home";
 import SwitchTheme from "./../SwitchTheme";
 
 const RenderMobileMenu = ({ mobileMenuId }) => {
@@ -57,11 +52,6 @@ const RenderMobileMenu = ({ mobileMenuId }) => {
       >
         <MenuItem>
           <SwitchTheme />
-        </MenuItem>
-        <Divider />
-        <MenuItem LinkComponent={Link} to="/">
-          <HomeIcon />
-          <p>Home</p>
         </MenuItem>
       </Menu>
     </>

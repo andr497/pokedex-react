@@ -4,10 +4,17 @@ export class ErrorBoundary extends React.Component {
   state = {
     hasError: false,
     errorMessage: "",
+    infoComponent: {
+      componentStack: "",
+    },
   };
 
   componentDidCatch = (error, info) => {
-    this.setState({ hasError: true, errorMessage: error.message });
+    this.setState({
+      hasError: true,
+      errorMessage: error.message,
+      infoComponent: info,
+    });
   };
 
   render() {
@@ -16,6 +23,13 @@ export class ErrorBoundary extends React.Component {
         <div style={styles.container}>
           <h1 style={styles.title}>Oops! Algo salió mal.</h1>
           <p style={styles.description}>{this.state.errorMessage}</p>
+          <div style={styles.stack}>
+            {this.state.infoComponent.componentStack
+              .split("\n")
+              .map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
+          </div>
         </div>
       );
     }
@@ -42,5 +56,12 @@ const styles = {
   description: {
     fontSize: "1.5rem",
     color: "#333",
+  },
+  stack: {
+    width: "50%",
+    minWidth: "300px",
+    maxHeight: "500px",
+    overflowX: "scroll",
+    border: "1px solid red",
   },
 };

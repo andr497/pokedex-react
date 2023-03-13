@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import SearchPokemon from "./../components/SearchPokemon";
 

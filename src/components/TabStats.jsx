@@ -5,7 +5,6 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Slide from "@mui/material/Slide";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -21,8 +20,6 @@ import {
   fixStatsName,
   wc_hex_is_light,
 } from "./../helpers";
-
-import useWidth from "../hooks/useWidth";
 
 const StyledTabs = styled((props) => (
   <Tabs
@@ -58,20 +55,6 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   })
 );
 
-const animationKeyframes = (typecolor) => {
-  return keyframes({
-    "0%": {
-      background: `linear-gradient(45deg, ${typecolor[0]}, ${typecolor[1]})`,
-    },
-    "50%": {
-      background: `linear-gradient(45deg, ${typecolor[1]}, ${typecolor[0]})`,
-    },
-    "100%": {
-      background: `linear-gradient(45deg, ${typecolor[0]}, ${typecolor[1]})`,
-    },
-  });
-};
-
 const ProgressBarStat = styled(LinearProgress)(({ theme, typecolor }) => ({
   height: 20,
   borderRadius: 5,
@@ -93,7 +76,6 @@ const ProgressBarStat = styled(LinearProgress)(({ theme, typecolor }) => ({
 }));
 
 function LinearProgressWithLabel(props) {
-  const theme = useTheme();
   const labelValue = Math.round(props.label).toString();
 
   let calculateSpace = 100 - props.value;

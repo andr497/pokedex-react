@@ -8,7 +8,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Divider } from "@mui/material";
+import Divider from "@mui/material/Divider";
+import useWidth from "./../hooks/useWidth";
 
 const Modal = ({
   isShowing,
@@ -16,11 +17,18 @@ const Modal = ({
   transformTitleCss = "none",
   title = "Filler message",
   content = "Content message",
-}) =>
-  isShowing
+}) => {
+  const width = useWidth();
+
+  return isShowing
     ? ReactDOM.createPortal(
         <React.Fragment>
-          <Dialog open={isShowing} onClose={hide}>
+          <Dialog
+            open={isShowing}
+            onClose={hide}
+            maxWidth={["md", "lg", "xl"].includes(width) ? "md" : width}
+            fullWidth={true}
+          >
             <DialogTitle
               component="h2"
               sx={{ textTransform: transformTitleCss }}
@@ -44,5 +52,6 @@ const Modal = ({
         document.body
       )
     : null;
+};
 
 export default Modal;

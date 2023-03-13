@@ -78,6 +78,18 @@ export function fixAbilitiesName(name) {
   return name;
 }
 
+export function fixVarietiesName(name, is_default) {
+  if (!name) {
+    return "";
+  }
+
+  if (name.includes("-")) {
+    return name.replace("-", " ");
+  }
+
+  return name;
+}
+
 export function convertHectogramToKilogram(hg) {
   //1 hectogram = 0.1 kilograms
   return hg / 10;
@@ -105,10 +117,8 @@ const makePokes = (pokes) => {
         return { node, depth: path.length };
       })
       .reduce((a, { node, depth }) => {
-        //console.log("reduce", node);
         let pokemonID = node.species.url.split("/")[6];
         let urlArtWork = URL_IMAGE_ARTWORKS;
-
         let evo_details = node.evolution_details[0];
 
         return {
@@ -135,6 +145,10 @@ const makePokes = (pokes) => {
               needs_overworld_rain: evo_details?.needs_overworld_rain ?? null,
               party_species: evo_details?.party_species?.name ?? null,
               party_type: evo_details?.party_type?.name ?? null,
+              time_of_day: evo_details?.time_of_day ?? null,
+              trade_species: evo_details?.trade_species?.name ?? null,
+              location: evo_details?.location?.name ?? null,
+              turn_upside_down: evo_details?.turn_upside_down ?? null,
 
               relative_physical_stats:
                 evo_details?.relative_physical_stats ?? null,

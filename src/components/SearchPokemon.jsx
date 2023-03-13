@@ -7,11 +7,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import SearchIcon from "@mui/icons-material/Search";
 
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getPokemonByIdNoDispatch,
-  selectDataPokemonId,
-} from "./../reducers/pokemon";
+import { getPokemonByIdNoDispatch } from "./../reducers/pokemon";
 import { useNavigate } from "react-router-dom";
 
 const Search = styled("form")(({ theme }) => ({
@@ -28,6 +24,9 @@ const Search = styled("form")(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     marginLeft: theme.spacing(1),
     width: "auto",
+  },
+  [theme.breakpoints.between("xs", "sm")]: {
+    width: "200px",
   },
 }));
 
@@ -58,9 +57,9 @@ const StyledInputBase = styled(InputBase)(({ theme, ...props }) => {
       )}, ${theme.transitions.create("padding-left")}`,
       width: "100%",
       [theme.breakpoints.up("sm")]: {
-        width: "12ch",
+        width: "150px",
         "&:focus": {
-          width: "20ch",
+          width: "250px",
         },
       },
     },
@@ -99,7 +98,7 @@ const SearchPokemon = () => {
   const handleOnClick = (e) => {
     e.preventDefault();
 
-    const formatValue = value.replace(" ", "-");
+    const formatValue = value.replace(" ", "-").toLocaleLowerCase();
 
     setLoading(true);
     getPokemonByIdNoDispatch(formatValue)

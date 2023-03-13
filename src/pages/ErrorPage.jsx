@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 
 const ErrorPage = ({
   title = "Oops! Something is wrong",
-  message = "The pokemon you ar looking for might be not exist or is not added yet.",
+  message = "The pokemon you're looking for might be not exist or is not added yet.",
   urlOptions = {
     tag: "Go to Home",
     link: "/",
@@ -28,7 +28,8 @@ const ErrorPage = ({
       <img
         src="/pikachu.png"
         style={{
-          width: "420px",
+          maxWidth: "420px",
+          width: "100%",
         }}
       />
       <Box

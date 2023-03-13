@@ -1,8 +1,6 @@
 import React from "react";
 import { Card, CardHeader, CardContent, Box } from "@mui/material";
 
-import { cardMediaClasses } from "@mui/material/CardMedia";
-
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 
@@ -19,10 +17,7 @@ const UrlBase = URL_IMAGE_ARTWORKS;
 
 const imgSize = "200px";
 
-const SvgPokeball = styled(Pokeball)(({ theme, ...otherProps }) => {
-  const colorType1 = otherProps["data-color-type1"];
-  const colorType2 = otherProps["data-color-type2"];
-
+const SvgPokeball = styled(Pokeball)(({ theme }) => {
   const strokeColor = theme.palette.text.secondary;
 
   return {

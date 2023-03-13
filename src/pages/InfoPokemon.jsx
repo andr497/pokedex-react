@@ -1,20 +1,25 @@
 import React, { useEffect, useState, useMemo } from "react";
 
+import "react-lazy-load-image-component/src/effects/opacity.css";
+import "../App.css";
+
+import { capitalize } from "@mui/material";
+
+import Fade from "@mui/material/Fade";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
-import "../App.css";
 
 import { useParams, Link, useLocation } from "react-router-dom";
 
@@ -28,16 +33,17 @@ import TabStats from "../components/TabStats";
 import { colorPokemonTypes, fixPokemonName } from "./../helpers";
 import { styled, useTheme } from "@mui/material/styles";
 
-import { fixEvolutionChain } from "../helpers";
+import { fixEvolutionChain, wc_hex_is_light } from "../helpers";
 
-import { URL_IMAGE_ITEMS, URL_IMAGE_ARTWORKS } from "./../helpers/constants";
-import TableStats from "../components/TableStats";
+import { URL_IMAGE_ITEMS } from "./../helpers/constants";
 
 import ErrorPage from "./ErrorPage";
 
 import PokemonCardBasicDetails from "../components/InfoPokemon/PokemonCardBasicDetails";
+import useWidth from "./../hooks/useWidth";
+import LazyLoadImageWithTransition from "../components/InfoPokemon/LazyLoadImageWithTransition";
 
-const UrlBase = URL_IMAGE_ARTWORKS;
+//const UrlBase = URL_IMAGE_ARTWORKS;
 
 const StyledLink = styled(Link)((props) => ({
   display: "flex",
@@ -65,7 +71,7 @@ const InfoPokemon = () => {
 
   const [idImage, setIdImage] = useState(id);
   const [isForm, setIsForm] = useState(false);
-  const [shiny, setShiny] = useState(false);
+  //const [shiny, setShiny] = useState(false);
 
   //const appBarTitle = useSelector((state) => state.general.title);
   const location = useLocation();
@@ -87,7 +93,7 @@ const InfoPokemon = () => {
     const idToRender = isForm ? idImage : id;
 
     dispatch(getPokemonById(idToRender));
-    setShiny(false);
+    //setShiny(false);
     setIdImage(idToRender);
   }, [dispatch, id, idImage, isForm]);
 
@@ -114,16 +120,94 @@ const InfoPokemon = () => {
     return [prevPokemon, nextPokemon];
   }, [data?.id]);
 
-  if (loading) {
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={true}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-  }
+  let generaPokemon = useMemo(() => {
+    const data_genera = data?.genera?.filter((v) => v.language.name === "en");
+
+    return data_genera?.length > 0 ? data_genera[0]?.genus : "Not Available";
+  }, [data]);
+
+  // if (loading) {
+  //   return (
+  //     <Container
+  //       maxWidth="xl"
+  //       component="main"
+  //       sx={{
+  //         position: "relative",
+  //         height: "calc(100vh - 50px)",
+  //         width: "100%",
+  //         margin: 0,
+  //         padding: 0,
+  //       }}
+  //     >
+  //       <Grid
+  //         container
+  //         display="flex"
+  //         alignItems="center"
+  //         justifyContent="space-around"
+  //         position="relative"
+  //       >
+  //         <Grid item xs={12}>
+  //           <Typography
+  //             component="h1"
+  //             sx={{
+  //               WebkitBackgroundClip: "text",
+  //               WebkitTextFillColor: "transparent",
+  //               fontWeight: "bold",
+  //               textAlign: "center",
+  //               textTransform: "uppercase",
+  //             }}
+  //           >
+  //             <Skeleton sx={{ height: "12em" }} />
+  //           </Typography>
+  //         </Grid>
+  //       </Grid>
+  //       <Grid
+  //         container
+  //         sx={{
+  //           display: "flex",
+  //           alignItems: "center",
+  //         }}
+  //       >
+  //         <Grid item xs={12} md={3}>
+  //           <Skeleton variant="rectangular" sx={{ height: "500px" }} />
+  //         </Grid>
+  //         <Grid item xs={12} md={4} display="center" justifyContent="center">
+  //           <LazyLoadImage
+  //             // src={`${UrlBase}${
+  //             //   idImage == 10158 ? "pikachu-partner" : idImage
+  //             // }.png`}
+  //             src={data?.artwork_url}
+  //             alt={`pokemon-${data?.name}`}
+  //             effect="blur"
+  //             placeholderSrc={`/pokeball.png`}
+  //             style={{
+  //               width: "100%",
+  //               maxWidth: "500px",
+  //               filter: `drop-shadow(7px 7px 0px ${colorType1}) drop-shadow(-7px -7px 0px ${colorType2})`,
+  //             }}
+  //           />
+  //         </Grid>
+  //         <Grid item xs={12} md={5}>
+  //           <Skeleton variant="rectangular" sx={{ height: "500px" }} />
+  //         </Grid>
+  //         <Grid item xs={12}>
+  //           <Typography variant="h5" align="center">
+  //             Evolution chain
+  //           </Typography>
+  //           <Box
+  //             sx={{
+  //               display: "flex",
+  //               justifyContent: "space-evenly",
+  //               width: "100%",
+  //             }}
+  //           >
+  //             <Skeleton sx={{ width: "100%" }} />
+  //           </Box>
+  //         </Grid>
+  //       </Grid>
+  //     </Container>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -133,6 +217,9 @@ const InfoPokemon = () => {
       />
     );
   }
+
+  console.clear();
+  console.log(evolutionChain);
 
   return (
     <Container
@@ -160,6 +247,7 @@ const InfoPokemon = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            minHeight: "12em",
           }}
         >
           <StyledLink
@@ -173,20 +261,27 @@ const InfoPokemon = () => {
           </StyledLink>
         </Grid>
         <Grid item xs={8}>
-          <Typography
-            component="h1"
-            sx={{
-              background: `linear-gradient(to right, ${colorType1}, ${colorType2})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontWeight: "bold",
-              fontSize: data?.name.length === 10 ? "7vw" : "8vw",
-              textAlign: "center",
-              textTransform: "uppercase",
-            }}
-          >
-            {fixPokemonName(data?.name)}
-          </Typography>
+          <Fade in={!loading} timeout={550}>
+            <Typography
+              component="h1"
+              sx={{
+                background: `linear-gradient(to right, ${colorType1}, ${colorType2})`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: "bold",
+                fontSize: "6vw",
+                maxHeight: "10em",
+                textAlign: "center",
+                textTransform: "uppercase",
+                [theme.breakpoints.down("md")]: {
+                  fontSize: "10vw",
+                  maxHeight: "5em",
+                },
+              }}
+            >
+              {fixPokemonName(data?.name)}
+            </Typography>
+          </Fade>
         </Grid>
         <Grid
           item
@@ -215,38 +310,87 @@ const InfoPokemon = () => {
           alignItems: "center",
         }}
       >
-        <Grid item xs={12} md={3}>
-          {data ? (
-            <PokemonCardBasicDetails
-              pokemonId={data?.id}
-              colors={{ colorType1, colorType2 }}
-              height={data?.height}
-              weight={data?.weight}
-              types={data?.types}
-              abilities={data?.abilities}
-              varieties={data?.varieties}
-              setIdImage={setIdImage}
-              setIsForm={setIsForm}
-            />
-          ) : null}
+        <Grid item xs={12} sm={6} md={4}>
+          <Fade in={!loading} timeout={550}>
+            <Box>
+              <PokemonCardBasicDetails
+                pokemonId={data?.id}
+                pokemon_original_id={data?.pokemon_original_id}
+                colors={{ colorType1, colorType2 }}
+                height={data?.height}
+                weight={data?.weight}
+                types={data?.types}
+                abilities={data?.abilities}
+                varieties={data?.varieties}
+                setIdImage={setIdImage}
+                setIsForm={setIsForm}
+              />
+            </Box>
+          </Fade>
         </Grid>
-        <Grid item xs={12} md={4} display="center" justifyContent="center">
-          <LazyLoadImage
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            order: { xs: "-4", sm: "0" },
+          }}
+        >
+          {/* <LazyLoadImage
             // src={`${UrlBase}${
             //   idImage == 10158 ? "pikachu-partner" : idImage
             // }.png`}
             src={data?.artwork_url}
             alt={`pokemon-${data?.name}`}
-            effect="blur"
-            placeholderSrc={`/pokeball.png`}
+            effect="opacity"
+            //placeholderSrc={`/pokeball.png`}
+            //onLoad={handleImageLoad}
+            key={data?.artwork_url}
             style={{
               width: "100%",
               maxWidth: "500px",
+              height: "100%",
               filter: `drop-shadow(7px 7px 0px ${colorType1}) drop-shadow(-7px -7px 0px ${colorType2})`,
             }}
-          />
+          /> */}
+          <Fade in={!loading} timeout={550}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <LazyLoadImageWithTransition
+                src={data?.artwork_url}
+                alt={`pokemon-${data?.name}`}
+                key={data?.artwork_url}
+                colorType1={colorType1}
+                colorType2={colorType2}
+              />
+              <Typography
+                component="h6"
+                variant="h6"
+                sx={{
+                  background: colorType1,
+                  color: wc_hex_is_light(colorType1) ? "white" : "black",
+                  borderRadius: "8px",
+                  padding: "5px 10px",
+                  marginBottom: "10px",
+                }}
+              >
+                {generaPokemon}
+              </Typography>
+            </Box>
+          </Fade>
         </Grid>
-        <Grid item xs={12} md={5}>
+
+        <Grid item xs={12} sn={12} md={4}>
           <TabStats
             pokemonId={data?.id}
             stats={data?.stats}
@@ -258,7 +402,7 @@ const InfoPokemon = () => {
             colorType={[colorType1, colorType2]}
           /> */}
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} marginTop={5}>
           <Typography variant="h5" align="center">
             Evolution chain
           </Typography>
@@ -266,6 +410,7 @@ const InfoPokemon = () => {
             sx={{
               display: "flex",
               justifyContent: "space-evenly",
+              flexDirection: { xs: "column", md: "row" },
               width: "100%",
             }}
           >
@@ -303,6 +448,9 @@ const InfoPokemon = () => {
 };
 
 const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
+  const theme = useTheme();
+  const width = useWidth();
+
   const [colorType, setColorType] = useState([{ type: "" }]);
   const [loading, setLoading] = useState(false);
 
@@ -332,7 +480,7 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
   const fixTriggerName = (name) => {
     if (!name) return "";
 
-    return name.replace("-", " ");
+    return capitalize(name.replace("-", " "));
   };
 
   const fixGenderText = (gender) => {
@@ -350,8 +498,17 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
     min_beauty,
     trigger_name,
     item,
+    held_item,
     relative_physical_stats,
-    ...other
+    known_move,
+    known_move_type,
+    time_of_day,
+    location,
+    needs_overworld_rain,
+    turn_upside_down,
+    trade_species,
+    party_species,
+    ...others
   }) => {
     let fixTrigger = fixTriggerName(trigger_name);
     let minLevelArray = Object.entries({
@@ -359,38 +516,50 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
       min_happiness,
       min_affection,
       min_beauty,
-    }).filter((v) => v[1] !== null);
+    }).filter(([_, v]) => v !== null);
 
-    let textLevel = "";
-    if (minLevelArray.length > 1) {
-      throw new Error("Revisar que el length es mayor");
-    }
+    const textLevel =
+      minLevelArray.length === 1
+        ? minLevelArray[0][0] === "min_level"
+          ? minLevelArray[0][1]
+          : `${minLevelArray[0][1]} of ${minLevelArray[0][0].replace(
+              "min_",
+              ""
+            )}`
+        : "";
 
-    if (minLevelArray.length !== 0 && minLevelArray.length < 2) {
-      const [nameLevel, valueLevel] = minLevelArray[0];
-
-      textLevel =
-        nameLevel === "min_level"
-          ? valueLevel
-          : valueLevel + " of " + nameLevel.replace("min_", "");
-    }
-
-    if (item !== null) {
-      return fixTrigger + " " + item.replace("-", " ");
-    }
+    const fixItem =
+      item !== null
+        ? ` ${item.replace("-", " ")}`
+        : held_item !== null
+        ? ` holding ${held_item.replace("-", " ")}`
+        : "";
 
     //Data to show if
-    let physicalStats = "";
-    if (relative_physical_stats !== null) {
-      let rps = relative_physical_stats;
-      physicalStats =
-        rps === 0
-          ? "Attack = Defense"
-          : rps === 1
-          ? "Attack > Defense"
-          : "Attack < Defense";
-    }
-    return fixTrigger + " " + textLevel + "\n" + physicalStats;
+
+    const moreDetails = [
+      relative_physical_stats === 0
+        ? "Attack = Defense"
+        : relative_physical_stats === 1
+        ? "Attack > Defense"
+        : relative_physical_stats === 2
+        ? "Attack < Defense"
+        : null,
+      known_move && `knowing ${known_move}`,
+      known_move_type && `knowing ${known_move_type} move`,
+      time_of_day && `at ${time_of_day} time`,
+      location && `at ${location}`,
+      needs_overworld_rain && "during rain",
+      turn_upside_down && "holding the console upside down",
+      trade_species && `with ${trade_species}`,
+      party_species && `with ${party_species} in party`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    return `${fixTrigger}${fixItem} ${textLevel}${
+      moreDetails ? "\n" + moreDetails : ""
+    }`;
   };
 
   return (
@@ -398,7 +567,7 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
       component="article"
       sx={{
         display: "flex",
-        flexDirection: "row-reverse",
+        flexDirection: { xs: "column-reverse", md: "row-reverse" },
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -406,7 +575,7 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: { xs: "column", md: "row" },
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -437,10 +606,27 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
         </Box>
       </Box>
       {!firstPokemon ? (
-        <Box>
-          <ArrowForwardIcon />
-          <Typography variant={"body1"} component="h5">
-            {fixEvolutionMethod(pokemonDetail)}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row-reverse" },
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {["sm", "xs"].includes(width) ? (
+            <ArrowDownwardIcon />
+          ) : (
+            <ArrowForwardIcon />
+          )}
+          <Typography variant={"body1"} component="p">
+            {fixEvolutionMethod(pokemonDetail)
+              .split("\n")
+              .map((value, index) => (
+                <span key={index}>
+                  {value} <br />
+                </span>
+              ))}
           </Typography>
           {pokemonDetail.held_item !== null ? (
             <img src={`${URL_IMAGE_ITEMS}${pokemonDetail.held_item}.png`} />

@@ -10,13 +10,23 @@ import Typography from "@mui/material/Typography";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchPokemon from "../SearchPokemon";
-import RenderMenu from "./Menu/RenderMenu";
-import RenderMobileMenu from "./Menu/RenderMobileMenu";
 import SwitchTheme from "./SwitchTheme";
+import SwipeableTemporaryDrawer from "./Menu/SwipeableTemporaryDrawer";
 
 export default function Header({ title = "App name" }) {
-  const menuId = "primary-search-account-menu";
-  const mobileMenuId = "primary-search-account-menu-mobile";
+  const [open, setOpen] = React.useState(false);
+
+  const toggleDrawer = (event) => {
+    if (
+      event &&
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setOpen((prev) => !prev);
+  };
 
   return (
     <AppBar component="nav">
@@ -28,6 +38,9 @@ export default function Header({ title = "App name" }) {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={(e) => {
+              toggleDrawer(e);
+            }}
           >
             <MenuIcon />
           </IconButton>
@@ -54,14 +67,12 @@ export default function Header({ title = "App name" }) {
             {title}
           </Typography>
           <SearchPokemon />
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, flexGrow: 1 }}>
             <SwitchTheme />
           </Box>
-          {RenderMobileMenu({ mobileMenuId })}
         </Toolbar>
+        <SwipeableTemporaryDrawer open={open} toggleDrawer={toggleDrawer} />
       </Container>
-      {RenderMenu({ menuId })}
     </AppBar>
   );
 }

@@ -5,7 +5,6 @@ import {
   fetchPokemonSpeciesById,
 } from "../api/pokemon";
 import { LIMIT_PAGE, URL_IMAGE_ARTWORKS } from "../helpers/constants";
-import { Try } from "@mui/icons-material";
 
 const initialState = {
   loading: false,
@@ -26,7 +25,6 @@ export const getAllPokemon = createAsyncThunk(
 
     data.results = await Promise.all(
       data.results.map(async (v) => {
-        //console.log(test.results[k]);
         let pokemonId = v.url.split("/")[6];
         let pokemon = await fetchPokemonById(pokemonId).then((res) => {
           return res.data;
@@ -142,8 +140,7 @@ export const pokemonSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(getPokemonById.pending, (state) => {
-        console.log("PENDIENTE");
-        state.dataPokemonId = null;
+        //state.dataPokemonId = null;
         state.loadingId = true;
       })
       .addCase(getPokemonById.rejected, (state, action) => {
@@ -151,7 +148,6 @@ export const pokemonSlice = createSlice({
         state.errorPokemonId = action.error;
       })
       .addCase(getPokemonById.fulfilled, (state, action) => {
-        console.log("FULFILLED");
         state.dataPokemonId = action.payload;
         state.errorPokemonId = false;
         state.loadingId = false;
