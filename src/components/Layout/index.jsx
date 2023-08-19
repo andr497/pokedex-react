@@ -7,11 +7,11 @@ import Header from "./Header";
 import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 
-const index = (props) => {
+const index = ({ title = "PokeDéx", children }) => {
   return (
     <Box sx={{ display: "flex", position: "relative", height: "100vh" }}>
       <CssBaseline />
-      <Header title={"PokeDéx"} />
+      <Header title={title} />
       <Box
         component="main"
         sx={{
@@ -25,7 +25,7 @@ const index = (props) => {
           height: "calc(100% - 40px)",
         }}
       >
-        {props.children}
+        {children}
       </Box>
     </Box>
   );

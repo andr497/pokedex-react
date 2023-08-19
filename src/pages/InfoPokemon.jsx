@@ -11,7 +11,6 @@ import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
@@ -516,7 +515,7 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
       min_happiness,
       min_affection,
       min_beauty,
-    }).filter(([_, v]) => v !== null);
+    }).filter(([, v]) => v !== null);
 
     const textLevel =
       minLevelArray.length === 1
@@ -574,8 +573,9 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
     >
       <Box
         sx={{
+          background: "blue",
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
+          flexDirection: { xs: "column" },
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -593,7 +593,11 @@ const EvolutionDetails = ({ pokemonDetail, firstPokemon }) => {
           }}
         />
         <Box sx={{ textAlign: "center" }}>
-          <Typography variant={"body1"} component="h5">
+          <Typography
+            variant={"body1"}
+            component="h5"
+            sx={{ color: `${colorType1}` }}
+          >
             {pokemonDetail.id}
           </Typography>
           <Typography

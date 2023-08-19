@@ -11,6 +11,7 @@ import Searcher from "./pages/Searcher";
 function App() {
   return (
     <BrowserRouter>
+      {/* RENDERIZADO DE LAYOUT */}
       <Layout>
         <Routes>
           <Route path="/" element={<Main />} />
@@ -32,3 +33,18 @@ function App() {
 }
 
 export default App;
+
+{
+  /* <Route path="/" element={<Main />} />
+          <Route path="/pokemon/:id" element={<InfoPokemon />} />
+          <Route path="/searcher" element={<Searcher />} />
+          <Route
+            path="*"
+            element={
+              <ErrorPage
+                title="Page not Found"
+                message="The page you are looking for was not found."
+              />
+            }
+          /> */
+}
