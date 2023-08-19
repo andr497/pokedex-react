@@ -8,7 +8,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import ThemeContext from "./providers/ThemeContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <>
+  <React.StrictMode>
     <ErrorBoundary>
       <ThemeContext>
         <Provider store={store}>
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </Provider>
       </ThemeContext>
     </ErrorBoundary>
-  </>
+  </React.StrictMode>
 );
